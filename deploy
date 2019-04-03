@@ -13,8 +13,8 @@ rnd=$(cat /dev/urandom | tr -cd 0-9a-zA-Z | head -c 32)
 [ -e "/home/ueda/rnd" ] && rnd=$(cat /home/ueda/rnd ) #REMOVE ON RELEASE!!!
 mv "fetch" "fetch_$rnd.cgi"
 
-### PULL DATA ###
-rm -rf "${contentsdir:?}"
+### PULL ARTICLE REPO ###
+rm -rf "${contentsdir?}"
 cd "$wwwdir"
 git clone "https://github.com/$contents_owner/$contents"
 chown www-data:www-data "$contentsdir" -R
