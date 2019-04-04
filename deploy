@@ -26,6 +26,6 @@ chown www-data:www-data "$contentsdir" -R
 ### INITIALIZE ###
 touch "$datadir/INIT"
 chown www-data:www-data "$datadir/INIT"
-sudo -u www-data "$appdir/fetch_$rnd.cgi"
+sudo -u www-data CONTENT_LENGTH="" "$appdir/fetch_$rnd.cgi"
 
 echo "call fetch_$rnd.cgi from GitHub"
