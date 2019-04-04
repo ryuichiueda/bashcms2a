@@ -8,7 +8,7 @@ Content-type: text/html
     <meta name="description" content="">
     <!--<meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">-->
     <!--<meta name="generator" content="Jekyll v3.8.5">-->
-    <title>$title$</title>
+    <title>$title$ | $sitetitle$</title>
 
     <!--<link rel="canonical" href="https://getbootstrap.com/docs/4.3/examples/jumbotron/">-->
 
@@ -38,11 +38,13 @@ Content-type: text/html
     <link href="/bsview/jumbotron.css" rel="stylesheet">
   </head>
   <body>
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v3.2"></script>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-  <a class="navbar-brand" href="#">bashcms2ブログ</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+      <a class="navbar-brand" href="$protocol$//$host$">$sitetitle$</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+         <span class="navbar-toggler-icon"></span>
+      </button>
 
   <div class="collapse navbar-collapse" id="navbarsExampleDefault">
     <ul class="navbar-nav mr-auto">
@@ -93,8 +95,8 @@ Content-type: text/html
   <!-- Main jumbotron for a primary marketing message or call to action -->
   <div class="jumbotron">
     <div class="container">
-      <h1>bashcms2ブログ</h1>
-      <p>Bootstrap便利ですね。</p>
+      <h1>$sitetitle$</h1>
+      <p>$sitesubtitle$</p>
     </div>
   </div>
 
@@ -112,6 +114,13 @@ Content-type: text/html
 	<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-via="$twitter$" data-show-count="false">Tweet</a>
 	<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 	$endif$
+	$if(line)$
+	<div class="line-it-button" data-lang="ja" data-type="like" data-url="$protocol$//$host$$page$" data-share="true" style="display: none;"></div>
+        <script src="https://d.line-scdn.net/r/web/social-plugin/js/thirdparty/loader.min.js" async="async" defer="defer"></script>
+        $endif$
+	$if(facebook)$
+	<div class="fb-like" data-href="$protocol$//$host$$page$" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+        $endif$
 	$if(pocket)$
         <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en"></a>
         <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>

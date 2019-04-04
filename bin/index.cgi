@@ -7,7 +7,7 @@ trap 'rm -f $tmp-*' EXIT
 
 ### VARIABLES ###
 tmp=/tmp/$$
-dir="$(tr -dc 'a-zA-Z0-9_=' <<< ${QUERY_STRING} | sed 's;=;s/;')"
+dir="$(tr -dc 'a-zA-Z0-9_=' <<< ${QUERY_STRING} | sed 's/fbclid=.*//' | sed 's;=;s/;')"
 [ -z "$dir" ] && dir="pages/top"
 [ "$dir" = "post" ] && dir="$(tail -n 1 "$datadir/post_list" | cut -d' ' -f 3)"
 md="$contentsdir/$dir/main.md"
@@ -17,7 +17,7 @@ md="$contentsdir/$dir/main.md"
 counter="$datadir/counters/$(tr '/' '_' <<< $dir)"
 echo -n 1 >> "$counter" # increment the counter
 
-cat << FIN | tee /tmp/hogehoge > $tmp-meta.yaml
+cat << FIN > $tmp-meta.yaml
 ---
 created_time: '$(date -f - < "$datadir/$dir/created_time")'
 modified_time: '$(date -f - < "$datadir/$dir/modified_time")'
@@ -25,6 +25,7 @@ title: '$(cat "$datadir/$dir/title")'
 nav: '$(cat "$datadir/$dir/nav")'
 views: '$(ls -l "$counter" | cut -d' ' -f 5)'
 $(cat "$contentsdir/config.yaml" ) 
+page: $(sed -e 's;^;/?;' -e 's;s/;=;' <<< $dir)
 ---
 FIN
 
