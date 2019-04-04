@@ -1,17 +1,17 @@
 #!/bin/bash -euvx
 source "$(dirname $0)/conf"
 exec 2> "$logdir/$(basename $0).$(date +%Y%m%d_%H%M%S).$$"
-#[ -n "${CONTENT_LENGTH}" ] && dd bs=${CONTENT_LENGTH} > /dev/null   #エラーを起こすので削除
+#[ -n "${CONTENT_LENGTH}" ] && dd bs=${CONTENT_LENGTH} > /dev/null
 
 echo -e 'Content-type: text/html\n'
 
-date
-echo GitHubからpull
+date                   # 追加
+echo GitHubからpull    # 追加
 cd "$contentsdir"
 git pull
 
-date
-echo 記事ディレクトリの作成とタイムスタンプ処理
+date                                             # 追加
+echo 記事ディレクトリの作成とタイムスタンプ処理  # 追加
 ### CREATE TIMESTAMP FILES IF NOT EXIST ###
 find posts pages -maxdepth 1 -type d    |
 grep /                                  |
@@ -28,6 +28,8 @@ while read d ; do
         'NR==1{print > mf}END{print > cf}'
 done
 
+date
+echo 記事の削除
 ### DELETE DELETED ARTICLES ###
 cd "$datadir"
 find posts pages -maxdepth 1 -type d    |
@@ -37,6 +39,8 @@ while read d ; do
         rm -Rf "./$d"
 done
 
+date
+echo リンクなどの作成
 ### MAKE SOME SHORTCUT ###
 find posts pages -maxdepth 1 -type d    |
 grep /                                  |
@@ -51,9 +55,15 @@ while read d ; do
         awk -v d="$d" '{gsub(/s\//,"=",d);
                 print "<a href=\"/?" d "\">" $0 "</a>"}' > "$datadir/$d/link"
 
+        ### この2行を追加 ###
+        ymd=$(sed 's/ .*//' < "$datadir/$d/created_time")
+        sed "s;</a>; ($ymd)&;" "$datadir/$d/link" > "$datadir/$d/link_date"
+
         touch "$datadir/$d/nav"
 done
 
+date
+echo 記事のリストの作成
 ### MAKE POST/PAGE LIST ###
 tmp=/tmp/$$
 
@@ -73,6 +83,8 @@ mv $tmp-post_list "$datadir/post_list"
 awk '$3~/^pages/' $tmp-list  > $tmp-page_list
 mv $tmp-page_list "$datadir/page_list"
 
+date
+echo 前後の記事のリンク作成
 # MAKE PREV/NEXT NAVIGATION LINK
 cat "$datadir/post_list"        |
 while read ymd hms d ; do
@@ -84,3 +96,32 @@ while read ymd hms d ; do
         sed -e '1s/^/prev:/' -e '2s/^/next:/'                           |
         tr '\n' ' '                                     > "$datadir/$d/nav"
 done
+
+date
+echo キーワードリストの作成
+### MAKE KEYWORD LIST ###
+cd "$contentsdir"
+cat $tmp-list                    |
+awk '{print $3 "/main.md"}'      |
+xargs grep -H -m 1 '^Keywords:'  |
+sed 's;/main.md:Keywords:; ;'    |
+sed 's/ *, */,/g'                |
+sed 's/  */ /g'                  |
+awk '{gsub(/^/,",",$2);print}'   |
+sed 's/$/,/'                     > $tmp-keyword_list
+mv $tmp-keyword_list "$datadir/keyword_list"
+
+date
+echo 検索ファイルの作成
+### MAKE SEARCH FILE ###
+cd "$contentsdir"
+cat $tmp-list                    |
+awk '{print $3 "/main.md"}'      |
+xargs grep -H ^                  |
+sed 's;/main.md:; ;'             |
+awk 'a!=$1{c=0;a=$1}c>=2{print}$2~/^---$/{c++}' |
+awk '$2~/^\*$|^#*$/{$2=""}{print}'              |
+awk 'NF>1'                      > $tmp-all
+mv $tmp-all "$datadir/all_markdown"
+
+echo 終了
